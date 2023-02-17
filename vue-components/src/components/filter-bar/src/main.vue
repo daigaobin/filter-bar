@@ -3,26 +3,32 @@
     <div class="filter-bar_left">
       <div class="filter-bar_left_content">
         <!-- icon -->
-        <div class="filter-bar_left_content_icon">
+        <div class="filter-bar_left_content_icon m-r-10">
           <slot name="icon">
             <i class="el-icon-search"></i>
           </slot>
         </div>
 
         <!-- 选中展示 -->
-        <div class="filter-bar_left_content_selected"></div>
+        <div class="filter-bar_left_content_selected">
+          <MoreButton
+            text="2个筛选条件"
+            ref="moreButton"
+            @click.stop="handleClickMore"
+            class="m-r-10"
+          >
+          </MoreButton>
+        </div>
 
         <!-- 输入 -->
-        <div class="filter-bar_left_content_input">
-          <el-input
-            v-model="search"
-            placeholder="搜索和筛选"
-            class="w200 m-l-10"
-            size="mini"
-            ref="input"
-            @focus="handleInputFocus"
-          ></el-input>
-        </div>
+        <el-input
+          v-model="search"
+          placeholder="搜索和筛选"
+          class="w200 m-r-10"
+          size="mini"
+          ref="input"
+          @focus.stop="handleInputFocus"
+        ></el-input>
       </div>
       <!-- 清除 -->
       <div class="filter-bar_left_clear">
@@ -37,51 +43,51 @@
     </div>
 
     <!-- 筛选指标列表popover -->
-    <el-popover
-      placement="bottom"
-      width="200"
-      trigger="manual"
-      v-model="visibleList"
-      :visible-arrow="false"
-      popper-class="filter-bar_popper"
-    >
-      <div v-clickOutside="hideListPopover" class="el-popover_container">
-        <div class="el-popover_container_title">筛选条件</div>
-        <ul class="el-popover_container_list">
-          <li
-            @click="handleFieldListClick(f)"
-            v-for="f in fieldList"
-            :key="f.value"
-          >
-            {{ f.label }}
-          </li>
-        </ul>
-      </div>
-      <div slot="reference" :style="popoverStyle">&nbsp;</div>
-    </el-popover>
+    <Popover :visible.sync="visibleList" :positionStyle="fieldListPopoverStyle">
+      <div class="el-popover_container_title">筛选条件</div>
+      <ul class="el-popover_container_list">
+        <li
+          @click="handleFieldListClick(f)"
+          v-for="f in fieldList"
+          :key="f.value"
+        >
+          {{ f.label }}
+        </li>
+      </ul>
+    </Popover>
 
     <!-- 填写具体内容popover -->
-    <el-popover
-      placement="bottom"
-      width="200"
-      trigger="manual"
-      v-model="visibleContent"
-      :visible-arrow="false"
-      popper-class="filter-bar_popper"
+    <Popover
+      :visible.sync="visibleContent"
+      :positionStyle="formPopoverStyle"
     >
-      <div class="el-popover_container" v-clickOutside="hideContentPopover">
-        <!-- <IncludeExclude :data="contentList"></IncludeExclude> -->
+      <component
+        :is="componentId"
+        :logic="logic"
+        :title="popoverTitle"
+        :value="popoverValue"
+        @cancel="visibleContent = false"
+        @apply="handleApply"
+      ></component>
+    </Popover>
 
-        <component
-          :is="componentId"
-          :logic="logic"
-          :title="popoverTitle"
-          @cancel="visibleContent = false"
-          @apply="handleApply"
-        ></component>
-      </div>
-      <div slot="reference" :style="popoverStyle">&nbsp;</div>
-    </el-popover>
+    <Popover
+      :visible.sync="moreListVisible"
+      width="auto"
+      :positionStyle="moreListPopoverStyle"
+    >
+      <MoreList
+        v-for="(d, index) in selectedList"
+        :label="d.label"
+        :logic="d.logic"
+        :text="d.text"
+        :key="`d.label${index}`"
+        class="m-b-10"
+        @del="handleDelSelected(index)"
+        @focus="handleFocusMoreList(d)"
+      >
+      </MoreList>
+    </Popover>
   </div>
 </template>
 
@@ -137,6 +143,13 @@
       display: flex;
       justify-content: left;
       align-items: center;
+
+      &_selected {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        font-size: 12px;
+      }
     }
 
     &_clear {
@@ -156,9 +169,13 @@
     width: 200px;
   }
 
-  .m-l-10 {
-    margin-left: 10px;
+  .m-r-10 {
+    margin-right: 10px;
   }
+}
+
+.m-b-10 {
+  margin-bottom: 10px;
 }
 </style>
 

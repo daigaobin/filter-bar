@@ -4,11 +4,17 @@
     <!-- <img alt="Vue logo" src="./assets/logo.png" />
     <HelloWorld msg="Welcome to Your Vue.js App" /> -->
     <el-table
-      :data="[{ name: 'Sdsdsdasaa阿达萨达' }]"
+      :data="[
+        { name: 'Sdsdsdasaa阿达萨达' },
+        { name: 'Sdsdsdasaa阿达萨达' },
+        { name: 'Sdsdsdasaa阿达萨达' },
+      ]"
       class="m-t-10"
       border
       size="mini"
-      :max-height="200"
+      :row-style="{ height: '0' }"
+      :cell-style="{ padding: '0' }"
+      style="font-size: 10px"
     >
       <el-table-column prop="name" label="名称"> </el-table-column>
       <el-table-column label="操作" width="80">
@@ -33,7 +39,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="less" scoped>
 html,
 body {
   font-family: Avenir, Helvetica, Arial, sans-serif;

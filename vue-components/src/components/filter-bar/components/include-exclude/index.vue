@@ -1,7 +1,7 @@
 <!--
  * @Author: 牧鱼
  * @Date: 2023-02-15 18:38:24
- * @LastEditTime: 2023-02-16 18:47:14
+ * @LastEditTime: 2023-02-17 15:17:40
  * @LastEditors: 牧鱼
  * @Description: 包含-不包含控件
  * @FilePath: \组件库\vue-components\src\components\filter-bar\components\include-exclude\index.vue
@@ -49,7 +49,9 @@
 
     <div class="include-exclude_footer">
       <el-button @click="cancel" size="mini">取消</el-button>
-      <el-button type="primary" @click="add" size="mini">应用</el-button>
+      <el-button type="primary" @click="add" size="mini" :disabled="isDisabled"
+        >应用</el-button
+      >
     </div>
   </div>
 </template>
@@ -68,14 +70,25 @@ export default {
       required: true,
       default: () => "",
     },
+
+    value: {
+      type: String | Number,
+      default: () => "",
+    },
   },
 
   data() {
     return {
-      keyword: "",
+      keyword: this.value,
       radio: "include",
       keywordList: [],
     };
+  },
+
+  computed: {
+    isDisabled() {
+      return !this.keyword.trim();
+    },
   },
 
   methods: {
@@ -121,7 +134,6 @@ export default {
   }
 
   .m-t-10 {
-    
     margin-top: 10px;
   }
 }

@@ -1,10 +1,13 @@
 import IncludeExclude from "../components/include-exclude";
 import clickOutside from "@/common/clickoutside";
+import MoreButton from "../components/more-button";
+import Popover from "../components/popover";
+import MoreList from "../components/select-content";
 
 export default {
   name: "FilterBar",
 
-  components: { IncludeExclude },
+  components: { IncludeExclude, MoreButton, Popover, MoreList },
 
   directives: { clickOutside },
 
@@ -42,10 +45,21 @@ export default {
       componentId: "",
       logic: [],
       popoverTitle: "",
+      popoverValue: "",
       search: "",
       visibleList: false,
       visibleContent: false,
-      popoverStyle: {
+      fieldListPopoverStyle: {
+        position: "absolute",
+        top: "0px",
+        left: "0px",
+      },
+      formPopoverStyle: {
+        position: "absolute",
+        top: "0px",
+        left: "0px",
+      },
+      moreListPopoverStyle: {
         position: "absolute",
         top: "0px",
         left: "0px",
@@ -68,20 +82,56 @@ export default {
         { label: "应用类型", value: "app_type", logic: LOGIC_EQ },
       ],
       contentList: [],
+      moreListVisible: false,
+      selectedList: [
+        {
+          label: "商主名称",
+          logic: "包含",
+          value: "business_name",
+          text: "上海头条",
+        },
+        {
+          label: "商主ID",
+          logic: "包含",
+          value: "business_id",
+          text: "上海头条",
+        },
+        {
+          label: "商主ID",
+          logic: "包含",
+          value: "business_id",
+          text: "上海头条",
+        },
+        {
+          label: "商主ID",
+          logic: "包含",
+          value: "business_id",
+          text: "上海头条",
+        },
+      ],
     };
   },
 
   methods: {
     handleApply() {},
 
+    handleClickMore() {
+      this.setPopoverStyle(
+        this.$refs.moreButton.$el,
+        this.moreListPopoverStyle
+      );
+      this.showMoreList();
+    },
+
     handleInputFocus() {
-      const { width, height, left, top } =
-        this.$refs.input.$el.getBoundingClientRect();
-      this.popoverStyle.left = left + width / 2 + "px";
-      this.popoverStyle.top = height - 10 + "px";
-      this.$nextTick(() => {
-        this.showListPopover();
-      });
+      this.setPopoverStyle(this.$refs.input.$el, this.fieldListPopoverStyle);
+      this.showListPopover();
+    },
+
+    setPopoverStyle($el, popoverStyle) {
+      const { width, height, left, top } = $el.getBoundingClientRect();
+      popoverStyle.left = left + width / 2 + "px";
+      popoverStyle.top = height - 10 + "px";
     },
 
     showListPopover() {
@@ -90,7 +140,7 @@ export default {
       }, 100);
     },
 
-    hideListPopover() {
+    hideFieldListPopover() {
       if (!this.$refs.input.$el.contains(document.activeElement)) {
         this.visibleList = false;
       }
@@ -105,15 +155,37 @@ export default {
     },
 
     handleFieldListClick(logic) {
-      this.hideListPopover();
+      this.hideFieldListPopover();
+      this.setPopoverStyle(this.$refs.input.$el, this.formPopoverStyle);
+      this.setContentPopoverComponentId(logic);
       this.showContentPopover();
-      this.setComponentId(logic);
     },
 
-    setComponentId({ logic, componentId, label }) {
+    handleDelSelected(index) {
+      debugger;
+    },
+
+    handleFocusMoreList({ value, text }) {
+      const logic = this.fieldList.find((f) => f.value === value);
+      this.popoverValue = text;
+      this.hideMoreList();
+      this.setPopoverStyle(this.$refs.moreButton.$el, this.formPopoverStyle);
+      this.setContentPopoverComponentId(logic);
+      this.showContentPopover();
+    },
+
+    setContentPopoverComponentId({ logic, componentId, label }) {
       this.logic = logic;
       this.componentId = componentId;
       this.popoverTitle = label;
+    },
+
+    showMoreList() {
+      this.moreListVisible = true;
+    },
+
+    hideMoreList() {
+      this.moreListVisible = false;
     },
   },
 };
