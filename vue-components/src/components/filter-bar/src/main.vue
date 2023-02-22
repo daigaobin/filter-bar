@@ -11,6 +11,18 @@
 
         <!-- 选中展示 -->
         <div class="filter-bar_left_content_selected">
+          <SelectItem
+            v-for="(d, $index) in selectedList"
+            :fieldLabel="d.fieldLabel"
+            :logicLabel="d.logicLabel"
+            :fieldText="d.fieldText"
+            :key="`d.fieldLabel${$index}`"
+            class="m-r-10"
+            @del="handleDelSelected($index)"
+            @focus.stop="handleFocusSelectedItem($event, d, $index)"
+          >
+          </SelectItem>
+
           <MoreButton
             text="2个筛选条件"
             ref="moreButton"
@@ -32,6 +44,7 @@
       </div>
       <!-- 清除 -->
       <div class="filter-bar_left_clear">
+        <el-button type="text" size="mini">保存</el-button>
         <el-button type="text" size="mini">清除</el-button>
       </div>
     </div>
@@ -44,6 +57,26 @@
 
     <!-- 筛选指标列表popover -->
     <Popover :visible.sync="visibleList" :positionStyle="fieldListPopoverStyle">
+      <div class="el-popover_container_title">近期搜索记录</div>
+      <ul class="el-popover_container_list">
+        <li
+          @click="handleFieldListClick(f)"
+          v-for="f in fieldList"
+          :key="f.value"
+        >
+          {{ f.label }}
+        </li>
+      </ul>
+      <div class="el-popover_container_title">已保存的搜索条件</div>
+      <ul class="el-popover_container_list">
+        <li
+          @click="handleFieldListClick(f)"
+          v-for="f in fieldList"
+          :key="f.value"
+        >
+          {{ f.label }}
+        </li>
+      </ul>
       <div class="el-popover_container_title">筛选条件</div>
       <ul class="el-popover_container_list">
         <li
@@ -56,37 +89,42 @@
       </ul>
     </Popover>
 
-    <!-- 填写具体内容popover -->
+    <!-- 填写具体filter内容popover -->
     <Popover
       :visible.sync="visibleContent"
       :positionStyle="formPopoverStyle"
+      @close="handleClose"
     >
       <component
+        :visible.sync="visibleContent"
         :is="componentId"
         :logic="logic"
+        :logicValue="logicValue"
         :title="popoverTitle"
-        :value="popoverValue"
+        :value="fieldValue"
         @cancel="visibleContent = false"
         @apply="handleApply"
+        ref="filterContent"
       ></component>
     </Popover>
 
+    <!-- 更多内容下拉列表 -->
     <Popover
       :visible.sync="moreListVisible"
       width="auto"
       :positionStyle="moreListPopoverStyle"
     >
-      <MoreList
+      <SelectItem
         v-for="(d, index) in selectedList"
-        :label="d.label"
-        :logic="d.logic"
-        :text="d.text"
-        :key="`d.label${index}`"
+        :fieldLabel="d.fieldLabel"
+        :logicLabel="d.logicLabel"
+        :fieldText="d.fieldText"
+        :key="`d.fieldLabel${index}`"
         class="m-b-10"
         @del="handleDelSelected(index)"
         @focus="handleFocusMoreList(d)"
       >
-      </MoreList>
+      </SelectItem>
     </Popover>
   </div>
 </template>
@@ -153,7 +191,7 @@
     }
 
     &_clear {
-      width: 50px;
+      width: 100px;
       text-align: left;
     }
   }

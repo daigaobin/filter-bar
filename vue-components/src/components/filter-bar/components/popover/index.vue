@@ -25,6 +25,7 @@ export default {
       type: Number | String,
       default: () => 200,
     },
+
     visible: {
       type: Boolean,
       required: true,
@@ -43,6 +44,7 @@ export default {
 
   methods: {
     hide() {
+      this.$emit("close");
       this.$emit("update:visible", false);
     },
   },

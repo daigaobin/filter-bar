@@ -1,10 +1,10 @@
 <template>
   <div class="select-container">
     <div class="select-content" @click="handleFocus">
-      <span class="select-content_name">{{ label }}</span>
-      <span class="select-content_logic"></span>
+      <span class="select-content_name">{{ fieldLabel }}</span>
+      <span class="select-content_logic">{{ logicLabel }}</span>
       <span class="select-content_text">
-        {{ text }}
+        {{ fieldText }}
       </span>
     </div>
     <i class="el-icon-close select-close" @click="handleDel"></i>
@@ -14,13 +14,13 @@
 <script>
 export default {
   props: {
-    label: {
+    fieldLabel: {
       type: String | Number,
     },
-    logic: {
+    logicLabel: {
       type: String | Number,
     },
-    text: {
+    fieldText: {
       type: String | Number,
     },
   },
@@ -30,8 +30,8 @@ export default {
       this.$emit("del");
     },
 
-    handleFocus() {
-      this.$emit("focus");
+    handleFocus($event) {
+      this.$emit("focus",$event);
     },
   },
 };

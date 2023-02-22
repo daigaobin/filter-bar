@@ -1,23 +1,33 @@
-import IncludeExclude from "../components/include-exclude";
 import clickOutside from "@/common/clickoutside";
 import MoreButton from "../components/more-button";
 import Popover from "../components/popover";
-import MoreList from "../components/select-content";
+import SelectItem from "../components/select-item";
+
+import InputOption from "../components/options/input";
+import SelectInputOption from "../components/options/select-input";
+import RadioOption from "../components/options/radio";
 
 export default {
   name: "FilterBar",
 
-  components: { IncludeExclude, MoreButton, Popover, MoreList },
+  components: {
+    MoreButton,
+    Popover,
+    SelectItem,
+    InputOption,
+    SelectInputOption,
+    RadioOption,
+  },
 
   directives: { clickOutside },
 
   data() {
-    const LOGIC_EQ = [
+    /* const LOGIC_EQ = [
       {
         label: "等于",
         value: "==",
       },
-    ];
+    ]; */
 
     const LOGIC_EQ_NEQ = [
       {
@@ -44,8 +54,9 @@ export default {
     return {
       componentId: "",
       logic: [],
+      logicValue: "",
       popoverTitle: "",
-      popoverValue: "",
+      fieldValue: "",
       search: "",
       visibleList: false,
       visibleContent: false,
@@ -65,55 +76,138 @@ export default {
         left: "0px",
       },
       fieldList: [
-        { label: "商主ID", value: "business_id", logic: LOGIC_EQ_NEQ },
+        {
+          label: "商主ID",
+          key: "business_id",
+          logic: LOGIC_EQ_NEQ,
+          logicValue: "==",
+          componentId: "SelectInputOption",
+        },
         {
           label: "商主名称",
-          value: "business_name",
+          key: "business_name",
           logic: LOGIC_IC_EC,
-          componentId: "IncludeExclude",
+          logicValue: "exclude",
+          componentId: "InputOption",
         },
-        { label: "供应商ID", value: "supplier_id", logic: LOGIC_EQ_NEQ },
-        { label: "供应商名称", value: "supplier_name", logic: LOGIC_IC_EC },
-        { label: "广告组ID", value: "ad_group_id", logic: LOGIC_EQ_NEQ },
-        { label: "广告组名称", value: "ad_group_name", logic: LOGIC_IC_EC },
-        { label: "广告ID", value: "ad_id", logic: LOGIC_EQ_NEQ },
-        { label: "广告名称", value: "ad_name", logic: LOGIC_IC_EC },
-        { label: "包名", value: "package_name", logic: LOGIC_EQ_NEQ },
-        { label: "应用类型", value: "app_type", logic: LOGIC_EQ },
+        {
+          label: "供应商ID",
+          key: "supplier_id",
+          logic: LOGIC_EQ_NEQ,
+          logicValue: "==",
+          componentId: "SelectInputOption",
+        },
+        {
+          label: "供应商名称",
+          key: "supplier_name",
+          logic: LOGIC_IC_EC,
+          logicValue: "include",
+          componentId: "InputOption",
+        },
+        {
+          label: "广告组ID",
+          key: "ad_group_id",
+          logic: LOGIC_EQ_NEQ,
+          logicValue: "==",
+          componentId: "SelectInputOption",
+        },
+        {
+          label: "广告组名称",
+          key: "ad_group_name",
+          logic: LOGIC_IC_EC,
+          logicValue: "include",
+          componentId: "InputOption",
+        },
+        {
+          label: "广告ID",
+          key: "ad_id",
+          logic: LOGIC_EQ_NEQ,
+          logicValue: "==",
+          componentId: "SelectInputOption",
+        },
+        {
+          label: "广告名称",
+          key: "ad_name",
+          logic: LOGIC_IC_EC,
+          logicValue: "include",
+          componentId: "InputOption",
+        },
+        {
+          label: "包名",
+          key: "package_name",
+          logic: LOGIC_EQ_NEQ,
+          logicValue: "==",
+          componentId: "RadioOption",
+        },
+        {
+          label: "应用类型",
+          key: "app_type",
+          logic: LOGIC_EQ_NEQ,
+          logicValue: "==",
+          componentId: "RadioOption",
+        },
       ],
       contentList: [],
       moreListVisible: false,
-      selectedList: [
-        {
-          label: "商主名称",
-          logic: "包含",
-          value: "business_name",
-          text: "上海头条",
-        },
-        {
-          label: "商主ID",
-          logic: "包含",
-          value: "business_id",
-          text: "上海头条",
-        },
-        {
-          label: "商主ID",
-          logic: "包含",
-          value: "business_id",
-          text: "上海头条",
-        },
-        {
-          label: "商主ID",
-          logic: "包含",
-          value: "business_id",
-          text: "上海头条",
-        },
-      ],
+      selectedList: [],
     };
   },
 
   methods: {
-    handleApply() {},
+    handleApply({ logicValue, value: fieldText }) {
+      this.currentSelectedItemIndex !== ""
+        ? this.update(logicValue, fieldText)
+        : this.add(logicValue, fieldText);
+    },
+
+    add(logicValue, fieldText) {
+      const existList = this.selectedList.filter(
+        (s) =>
+          s.logicValue === logicValue &&
+          s.fieldText === fieldText &&
+          s.fieldKey === this.currentKey
+      );
+      !existList.length &&
+        this.selectedList.push({
+          ...this.getSelectedItemInfo(this.currentKey, logicValue),
+          fieldText,
+        });
+    },
+
+    update(logicValue, fieldText) {
+      const fieldKey =
+        this.selectedList[this.currentSelectedItemIndex].fieldKey;
+      this.selectedList.splice(this.currentSelectedItemIndex, 1, {
+        ...this.getSelectedItemInfo(fieldKey, logicValue),
+        fieldText,
+      });
+    },
+
+    getSelectedItemInfo(fieldKey, logicValue) {
+      const { label: fieldLabel, logic } = this.fieldList.find(
+        (f) => f.key === fieldKey
+      );
+      const logicLabel = logic.find((l) => l.value === logicValue).label;
+      return {
+        fieldLabel,
+        logicLabel,
+        logicValue,
+        fieldKey,
+      };
+    },
+
+    handleFocusSelectedItem(
+      $event,
+      { fieldKey, fieldText, logicValue },
+      currentSelectedItemIndex
+    ) {
+      const logic = this.fieldList.find((f) => f.key === fieldKey);
+      this.fieldValue = fieldText;
+      this.currentSelectedItemIndex = currentSelectedItemIndex;
+      this.setPopoverStyle($event.currentTarget, this.formPopoverStyle);
+      this.setValue(Object.assign({}, logic, { logicValue }));
+      this.showContentPopover();
+    },
 
     handleClickMore() {
       this.setPopoverStyle(
@@ -156,28 +250,31 @@ export default {
 
     handleFieldListClick(logic) {
       this.hideFieldListPopover();
+      this.fieldValue = "";
       this.setPopoverStyle(this.$refs.input.$el, this.formPopoverStyle);
-      this.setContentPopoverComponentId(logic);
+      this.setValue(logic);
       this.showContentPopover();
     },
 
     handleDelSelected(index) {
-      debugger;
+      this.selectedList.splice(index, 1);
     },
 
     handleFocusMoreList({ value, text }) {
       const logic = this.fieldList.find((f) => f.value === value);
-      this.popoverValue = text;
+      this.fieldValue = text;
       this.hideMoreList();
       this.setPopoverStyle(this.$refs.moreButton.$el, this.formPopoverStyle);
-      this.setContentPopoverComponentId(logic);
+      this.setValue(logic);
       this.showContentPopover();
     },
 
-    setContentPopoverComponentId({ logic, componentId, label }) {
+    setValue({ logic, componentId, label, logicValue, key }) {
       this.logic = logic;
       this.componentId = componentId;
       this.popoverTitle = label;
+      this.logicValue = logicValue;
+      this.currentKey = key;
     },
 
     showMoreList() {
@@ -186,6 +283,11 @@ export default {
 
     hideMoreList() {
       this.moreListVisible = false;
+    },
+
+    handleClose() {
+      this.currentSelectedItemIndex = "";
+      this.currentKey = "";
     },
   },
 };
