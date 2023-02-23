@@ -31,7 +31,7 @@ export default {
     },
 
     handleFocus($event) {
-      this.$emit("focus",$event);
+      this.$emit("focus", $event);
     },
   },
 };
@@ -41,15 +41,14 @@ export default {
 .select-container {
   display: flex;
   align-items: center;
-  background-color: #f2f2f2;
   line-height: 28px;
-  border-radius: 6px;
   cursor: pointer;
   .select-content {
     display: flex;
     padding: 0 8px;
+    background-color: #f2f2f2;
+    border-radius: 6px 0 0 6px;
     &:hover {
-      border-radius: 6px 0 0 6px;
       background-color: rgba(0, 0, 0, 0.1);
     }
 
@@ -73,8 +72,9 @@ export default {
   .select-close {
     padding: 0 8px;
     line-height: 28px;
+    background-color: #f2f2f2;
+    border-radius: 0 6px 6px 0;
     &:hover {
-      border-radius: 0 6px 6px 0;
       background-color: rgba(0, 0, 0, 0.1);
     }
   }

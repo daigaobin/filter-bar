@@ -45,7 +45,7 @@
       <!-- 清除 -->
       <div class="filter-bar_left_clear">
         <el-button type="text" size="mini">保存</el-button>
-        <el-button type="text" size="mini">清除</el-button>
+        <el-button type="text" size="mini" @click="handleClear">清除</el-button>
       </div>
     </div>
 
