@@ -207,6 +207,9 @@ export default {
       this.setPopoverStyle($event.currentTarget, this.formPopoverStyle);
       this.setValue(Object.assign({}, logic, { logicValue }));
       this.showContentPopover();
+      this.$nextTick(() => {
+        this.$refs.formPopover.$refs.popover.updatePopper();
+      });
     },
 
     handleClickMore() {
@@ -224,8 +227,8 @@ export default {
 
     setPopoverStyle($el, popoverStyle) {
       const { width, height, left, top } = $el.getBoundingClientRect();
-      popoverStyle.left = left + width / 2 + "px";
-      popoverStyle.top = height - 10 + "px";
+      popoverStyle.left = left + "px";
+      popoverStyle.top = height - 20 + "px";
     },
 
     showListPopover() {

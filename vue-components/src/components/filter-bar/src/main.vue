@@ -94,6 +94,7 @@
       :visible.sync="visibleContent"
       :positionStyle="formPopoverStyle"
       @close="handleClose"
+      ref="formPopover"
     >
       <component
         :visible.sync="visibleContent"

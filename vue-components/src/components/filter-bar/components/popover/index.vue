@@ -1,11 +1,13 @@
 <template>
   <el-popover
-    placement="bottom"
+    placement="bottom-start"
     :width="width"
     trigger="manual"
     v-model="visible"
     :visible-arrow="false"
     popper-class="filter-bar_popper"
+    :popper-options="{ boundariesElement: 'body', removeOnDestroy: true }"
+    ref="popover"
   >
     <div v-clickOutside="hide" class="el-popover_container">
       <slot></slot>
@@ -52,7 +54,7 @@ export default {
 </script>
 
 <style lang="less">
-.filter-bar_popper {
+.el-popover.filter-bar_popper {
   border-radius: 10px;
 }
 </style>
