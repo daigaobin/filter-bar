@@ -150,7 +150,22 @@ export default {
       contentList: [],
       moreListVisible: false,
       selectedList: [],
+      maxLength: 1,
     };
+  },
+
+  computed: {
+    computedSelectedList() {
+      return this.selectedList.slice(0, this.maxLength);
+    },
+
+    computedMoreList() {
+      return this.selectedList.slice(this.maxLength);
+    },
+
+    isShowMoreButton() {
+      return this.selectedList.length > this.maxLength;
+    },
   },
 
   methods: {
@@ -206,7 +221,24 @@ export default {
       this.currentSelectedItemIndex = currentSelectedItemIndex;
       this.setPopoverStyle($event.currentTarget, this.formPopoverStyle);
       this.setValue(Object.assign({}, logic, { logicValue }));
-      this.showContentPopover();
+      this.hideMorePopover();
+      this.showFormPopover();
+      this.$nextTick(() => {
+        this.$refs.formPopover.$refs.popover.updatePopper();
+      });
+    },
+
+    handleFocusMoreItem(
+      { fieldKey, fieldText, logicValue },
+      currentSelectedItemIndex
+    ) {
+      const logic = this.fieldList.find((f) => f.key === fieldKey);
+      this.fieldValue = fieldText;
+      this.currentSelectedItemIndex = currentSelectedItemIndex + this.maxLength;
+      this.setPopoverStyle(this.$refs.moreButton.$el, this.formPopoverStyle);
+      this.setValue(Object.assign({}, logic, { logicValue }));
+      this.hideMorePopover();
+      this.showFormPopover();
       this.$nextTick(() => {
         this.$refs.formPopover.$refs.popover.updatePopper();
       });
@@ -217,12 +249,17 @@ export default {
         this.$refs.moreButton.$el,
         this.moreListPopoverStyle
       );
-      this.showMoreList();
+      this.showMorePopover();
+      this.hideFormPopover();
     },
 
     handleInputFocus() {
       this.setPopoverStyle(this.$refs.input.$el, this.fieldListPopoverStyle);
-      this.showListPopover();
+      this.showFieldPopover();
+    },
+
+    handleInputBlur() {
+      this.hideFieldPopover();
     },
 
     setPopoverStyle($el, popoverStyle) {
@@ -231,45 +268,35 @@ export default {
       popoverStyle.top = height - 20 + "px";
     },
 
-    showListPopover() {
-      setTimeout(() => {
-        this.visibleList = true;
-      }, 100);
+    showFieldPopover() {
+      this.$refs.fieldPopover.doShow();
     },
 
-    hideFieldListPopover() {
-      if (!this.$refs.input.$el.contains(document.activeElement)) {
-        this.visibleList = false;
-      }
+    hideFieldPopover() {
+      this.$refs.fieldPopover.doClose();
     },
 
-    showContentPopover() {
+    showFormPopover() {
       this.visibleContent = true;
     },
 
-    hideContentPopover() {
+    hideFormPopover() {
       this.visibleContent = false;
     },
 
     handleFieldListClick(logic) {
-      this.hideFieldListPopover();
       this.fieldValue = "";
       this.setPopoverStyle(this.$refs.input.$el, this.formPopoverStyle);
       this.setValue(logic);
-      this.showContentPopover();
+      this.showFormPopover();
     },
 
-    handleDelSelected(index) {
+    handleDelMoreItem(index) {
+      this.selectedList.splice(index + this.maxLength, 1);
+    },
+
+    handleDelSelectedItem(index) {
       this.selectedList.splice(index, 1);
-    },
-
-    handleFocusMoreList({ value, text }) {
-      const logic = this.fieldList.find((f) => f.value === value);
-      this.fieldValue = text;
-      this.hideMoreList();
-      this.setPopoverStyle(this.$refs.moreButton.$el, this.formPopoverStyle);
-      this.setValue(logic);
-      this.showContentPopover();
     },
 
     setValue({ logic, componentId, label, logicValue, key }) {
@@ -280,11 +307,11 @@ export default {
       this.currentKey = key;
     },
 
-    showMoreList() {
+    showMorePopover() {
       this.moreListVisible = true;
     },
 
-    hideMoreList() {
+    hideMorePopover() {
       this.moreListVisible = false;
     },
 
@@ -292,5 +319,11 @@ export default {
       this.currentSelectedItemIndex = "";
       this.currentKey = "";
     },
+
+    handleClickClear() {
+      this.selectedList = [];
+    },
+
+    handleClickSave() {},
   },
 };
