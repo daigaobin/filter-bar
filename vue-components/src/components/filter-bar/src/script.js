@@ -66,6 +66,7 @@ export default {
       logicValue: "",
       popoverTitle: "",
       fieldValue: "",
+      currentSource: [],
       search: "",
       visibleList: false,
       visibleContent: false,
@@ -209,73 +210,73 @@ export default {
       return "number";
     },
 
-    handleApply({ logicValue, value: fieldText }) {
+    handleApply(value) {
       this.currentSelectedItemIndex !== ""
-        ? this.update(logicValue, fieldText)
-        : this.add(logicValue, fieldText);
+        ? this.update(value)
+        : this.add(value);
     },
 
-    add(logicValue, fieldText) {
+    add(value) {
+      if (!this.isExist(value)) {
+        this.selectedList.push({
+          fieldKey: this.currentKey,
+          ...value,
+        });
+      }
+    },
+
+    isExist({ logicValue, fieldValue }) {
       const existList = this.selectedList.filter(
         (s) =>
           s.logicValue === logicValue &&
-          s.fieldText === fieldText &&
+          s.fieldValue === fieldValue &&
           s.fieldKey === this.currentKey
       );
-      !existList.length &&
-        this.selectedList.push({
-          ...this.getSelectedItemInfo(this.currentKey, logicValue),
-          fieldText,
-        });
+
+      return !!existList.length;
     },
 
-    update(logicValue, fieldText) {
+    update(value) {
       const fieldKey =
         this.selectedList[this.currentSelectedItemIndex].fieldKey;
       this.selectedList.splice(this.currentSelectedItemIndex, 1, {
-        ...this.getSelectedItemInfo(fieldKey, logicValue),
-        fieldText,
-      });
-    },
-
-    getSelectedItemInfo(fieldKey, logicValue) {
-      const { label: fieldLabel, logic } = this.fieldList.find(
-        (f) => f.key === fieldKey
-      );
-      const logicLabel = logic.find((l) => l.value === logicValue).label;
-      return {
-        fieldLabel,
-        logicLabel,
-        logicValue,
         fieldKey,
-      };
+        ...value,
+      });
     },
 
     handleFocusSelectedItem(
       $event,
-      { fieldKey, fieldText, logicValue },
+      { fieldKey, fieldValue, logicValue },
       currentSelectedItemIndex
     ) {
-      const logic = this.fieldList.find((f) => f.key === fieldKey);
-      this.fieldValue = fieldText;
-      this.currentSelectedItemIndex = currentSelectedItemIndex;
-      this.setPopoverStyle($event.currentTarget, this.formPopoverStyle);
-      this.setValue(Object.assign({}, logic, { logicValue }));
-      this.hideMorePopover();
-      this.showFormPopover();
-      this.$nextTick(() => {
-        this.$refs.formPopover.$refs.popover.updatePopper();
-      });
+      this.setFormPopoverInfo(
+        $event.currentTarget,
+        { fieldKey, fieldValue, logicValue },
+        currentSelectedItemIndex
+      );
     },
 
     handleFocusMoreItem(
-      { fieldKey, fieldText, logicValue },
+      { fieldKey, fieldValue, logicValue },
+      currentSelectedItemIndex
+    ) {
+      this.setFormPopoverInfo(
+        this.$refs.moreButton.$el,
+        { fieldKey, fieldValue, logicValue },
+        currentSelectedItemIndex
+      );
+    },
+
+    setFormPopoverInfo(
+      el,
+      { fieldKey, fieldValue, logicValue },
       currentSelectedItemIndex
     ) {
       const logic = this.fieldList.find((f) => f.key === fieldKey);
-      this.fieldValue = fieldText;
-      this.currentSelectedItemIndex = currentSelectedItemIndex + this.maxLength;
-      this.setPopoverStyle(this.$refs.moreButton.$el, this.formPopoverStyle);
+      this.fieldValue = fieldValue;
+      this.currentSelectedItemIndex = currentSelectedItemIndex;
+      this.setPopoverStyle(el, this.formPopoverStyle);
       this.setValue(Object.assign({}, logic, { logicValue }));
       this.hideMorePopover();
       this.showFormPopover();
@@ -334,7 +335,7 @@ export default {
 
     /* 单击field item */
     handleClickFieldItem(logic) {
-      this.fieldValue = "";
+      this.fieldValue = logic.multiple ? [] : "";
       this.setPopoverStyle(this.$refs.input.$el, this.formPopoverStyle);
       this.setValue(logic);
       this.showFormPopover();
@@ -358,12 +359,13 @@ export default {
       this.selectedList.splice(index, 1);
     },
 
-    setValue({ logic, componentId, label, logicValue, key }) {
+    setValue({ logic, componentId, label, logicValue, key, source }) {
       this.logic = logic;
       this.componentId = componentId;
       this.popoverTitle = label;
       this.logicValue = logicValue;
       this.currentKey = key;
+      this.currentSource = source;
     },
 
     handleClose() {

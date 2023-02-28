@@ -137,6 +137,7 @@
           :logicValue="logicValue"
           :title="popoverTitle"
           :value="fieldValue"
+          :source="currentSource"
           @cancel="visibleContent = false"
           @apply="handleApply"
           ref="filterContent"

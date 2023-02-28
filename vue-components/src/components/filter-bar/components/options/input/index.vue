@@ -1,7 +1,7 @@
 <!--
  * @Author: 牧鱼
  * @Date: 2023-02-15 18:38:24
- * @LastEditTime: 2023-02-22 18:19:38
+ * @LastEditTime: 2023-02-28 16:39:17
  * @LastEditors: 牧鱼
  * @Description: 筛选器input输入框控件
  * @FilePath: \组件库\vue-components\src\components\filter-bar\components\options\input\index.vue
@@ -24,10 +24,10 @@
     ></el-input>
 
     <div class="filter-input-option_footer">
-      <el-button @click="cancel" size="mini">取消</el-button>
+      <el-button @click="handleClickCancel" size="mini">取消</el-button>
       <el-button
         type="primary"
-        @click="handleApply"
+        @click="handleClickApply"
         size="mini"
         :disabled="isDisabled"
         >应用</el-button
@@ -38,6 +38,7 @@
 
 <script>
 export default {
+  name: "FilterInput",
   props: {
     visible: {
       type: Boolean,
@@ -70,8 +71,8 @@ export default {
 
   data() {
     return {
-      keyword: this.value,
       radio: this.logicValue,
+      keyword: this.value,
     };
   },
 
@@ -88,8 +89,8 @@ export default {
   watch: {
     visible(val) {
       if (val) {
-        this.keyword = this.value;
         this.radio = this.logicValue;
+        this.keyword = this.value;
       }
     },
 
@@ -103,15 +104,20 @@ export default {
   },
 
   methods: {
-    handleApply() {
+    handleClickApply() {
+      const fieldValue = this.keyword.trim();
+      const logicLabel = this.logic.find((l) => l.value === this.radio).label;
       this.$emit("apply", {
+        fieldLabel: this.title,
+        logicLabel,
         logicValue: this.radio,
-        value: this.keyword.trim(),
+        fieldValue,
+        fieldText: fieldValue,
       });
       this.$emit("update:visible");
     },
 
-    cancel() {
+    handleClickCancel() {
       this.$emit("cancel");
       this.$emit("update:visible");
     },

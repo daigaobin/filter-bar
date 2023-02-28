@@ -1,7 +1,7 @@
 <!--
  * @Author: 牧鱼
  * @Date: 2023-02-22 15:53:06
- * @LastEditTime: 2023-02-22 15:57:58
+ * @LastEditTime: 2023-02-28 16:28:59
  * @LastEditors: 牧鱼
  * @Description: 筛选器radio选择控件
  * @FilePath: \组件库\vue-components\src\components\filter-bar\components\options\radio\index.vue
@@ -16,15 +16,19 @@
       }}</el-radio>
     </el-radio-group>
 
-    <el-radio-group v-model="radioValue">
-      <el-radio :label="3">全部</el-radio>
-      <el-radio :label="6">Android</el-radio>
-      <el-radio :label="9">iOS</el-radio>
+    <el-radio-group v-model="radioValue" class="block-radio">
+      <el-radio :label="s.value" v-for="s in source" :key="s.value">{{
+        s.label
+      }}</el-radio>
     </el-radio-group>
 
     <div class="filter-radio-option_footer">
-      <el-button @click="cancel" size="mini">取消</el-button>
-      <el-button type="primary" @click="add" size="mini" :disabled="isDisabled"
+      <el-button @click="handleClickCancel" size="mini">取消</el-button>
+      <el-button
+        type="primary"
+        @click="handleClickApply"
+        size="mini"
+        :disabled="isDisabled"
         >应用</el-button
       >
     </div>
@@ -35,10 +39,21 @@
 export default {
   name: "FilterRadioOption",
   props: {
+    visible: {
+      type: Boolean,
+      required: true,
+      default: () => false,
+    },
+
     logic: {
       type: Array,
       required: true,
       default: () => [],
+    },
+
+    logicValue: {
+      type: String | Number,
+      default: () => "",
     },
 
     title: {
@@ -46,12 +61,23 @@ export default {
       required: true,
       default: () => "",
     },
+
+    value: {
+      type: String | Number,
+      default: () => "",
+    },
+
+    source: {
+      type: Array,
+      required: true,
+      default: () => [],
+    },
   },
 
   data() {
     return {
-      radio: "==",
-      radioValue: "",
+      radio: this.logicValue,
+      radioValue: this.value,
     };
   },
 
@@ -61,13 +87,40 @@ export default {
     },
   },
 
-  methods: {
-    rowStyle() {
-      return "background:#F3F4F7;color:#555";
+  watch: {
+    visible(val) {
+      if (val) {
+        this.radio = this.logicValue;
+        this.radioValue = this.value;
+      }
     },
 
-    cancel() {
+    logicValue(val) {
+      this.radio = val;
+    },
+
+    value(val) {
+      this.radioValue = val;
+    },
+  },
+
+  methods: {
+    handleClickApply() {
+      const fieldValue = this.radioValue;
+      const logicLabel = this.logic.find((l) => l.value === this.radio).label;
+      this.$emit("apply", {
+        fieldLabel: this.title,
+        logicLabel,
+        logicValue: this.radio,
+        fieldValue,
+        fieldText: this.source.find((s) => s.value === this.radioValue).label,
+      });
+      this.$emit("update:visible");
+    },
+
+    handleClickCancel() {
       this.$emit("cancel");
+      this.$emit("update:visible");
     },
   },
 };
@@ -84,17 +137,17 @@ export default {
     border-radius: 10px 10px 0 0;
   }
 
-  &_select {
-    width: 100%;
+  .block-radio {
+    margin-top: 6px;
+    .el-radio {
+      display: block;
+      padding: 5px 0;
+    }
   }
 
   &_footer {
     margin-top: 10px;
     text-align: right;
-  }
-
-  .m-t-10 {
-    margin-top: 10px;
   }
 }
 </style>

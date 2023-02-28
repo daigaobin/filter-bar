@@ -1,14 +1,14 @@
 <!--
  * @Author: 牧鱼
  * @Date: 2023-02-15 18:38:24
- * @LastEditTime: 2023-02-22 16:09:51
+ * @LastEditTime: 2023-02-28 15:46:16
  * @LastEditors: 牧鱼
  * @Description: 筛选器输入选择控件
  * @FilePath: \组件库\vue-components\src\components\filter-bar\components\options\select-input\index.vue
 -->
 <template>
-  <div class="equal-not-equal">
-    <header class="equal-not-equal_header">{{ title }}</header>
+  <div class="select-input">
+    <header class="select-input_header">{{ title }}</header>
 
     <el-radio-group v-model="radio">
       <el-radio :label="l.value" v-for="l in logic" :key="l.value">{{
@@ -22,12 +22,12 @@
       allow-create
       default-first-option
       :placeholder="getPlaceholder"
-      class="m-t-10 equal-not-equal_select"
+      class="m-t-10 select-input_select"
       size="mini"
       @change="handleChange"
     >
       <el-option
-        v-for="item in options"
+        v-for="item in keywordList"
         :key="item.value"
         :label="item.label"
         :value="item.value"
@@ -35,38 +35,24 @@
       </el-option>
     </el-select>
 
-    <el-table
-      :data="selectedList"
-      :header-cell-style="rowStyle"
-      class="m-t-10"
-      border
-      size="mini"
-      :max-height="200"
-      :show-header="false"
-    >
-      <el-table-column
-        prop="id"
-        label="ID"
-        header-align="center"
-        show-overflow-tooltip
-      >
-      </el-table-column>
+    <div class="select-input_list">
+      <ul>
+        <li v-for="(s, $index) in selectedList" :key="`s-${$index}`">
+          <span class="label">{{ s }}</span>
+          <span class="close"
+            ><i class="el-icon-close" @click="del($index)"></i
+          ></span>
+        </li>
+      </ul>
+    </div>
 
-      <el-table-column
-        label="操作"
-        width="80"
-        header-align="center"
-        align="center"
-      >
-        <template slot-scope="scope">
-          <el-button type="text" @click="del(scope.$index)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <div class="equal-not-equal_footer">
-      <el-button @click="cancel" size="mini">取消</el-button>
-      <el-button type="primary" @click="add" size="mini" :disabled="isDisabled"
+    <div class="select-input_footer">
+      <el-button @click="handleClickCancel" size="mini">取消</el-button>
+      <el-button
+        type="primary"
+        @click="handleClickApply"
+        size="mini"
+        :disabled="isDisabled"
         >应用</el-button
       >
     </div>
@@ -75,8 +61,19 @@
 
 <script>
 export default {
-  name: "EqualNotEqual",
+  name: "SelectInput",
   props: {
+    visible: {
+      type: Boolean,
+      required: true,
+      default: () => false,
+    },
+
+    logicValue: {
+      type: String | Number,
+      default: () => "",
+    },
+
     logic: {
       type: Array,
       required: true,
@@ -88,13 +85,18 @@ export default {
       required: true,
       default: () => "",
     },
+
+    value: {
+      type: Array,
+      default: () => [],
+    },
   },
 
   data() {
     return {
       keyword: "",
-      radio: "==",
-      options: [],
+      keywordList: [],
+      radio: this.logicValue,
       selectedList: [],
     };
   },
@@ -109,9 +111,40 @@ export default {
     },
   },
 
+  watch: {
+    visible(val) {
+      if (val) {
+        this.setRadio(this.logicValue);
+        this.setSelectedList(this.value);
+      }
+    },
+
+    logicValue(radio) {
+      this.setRadio(radio);
+    },
+
+    value(selectedList) {
+      this.setSelectedList(selectedList);
+    },
+  },
+
   methods: {
-    rowStyle() {
-      return "background:#F3F4F7;color:#555";
+    handleClickApply() {
+      const fieldValue = this.selectedList;
+      const logicLabel = this.logic.find((l) => l.value === this.radio).label;
+      this.$emit("apply", {
+        fieldLabel: this.title,
+        logicLabel,
+        logicValue: this.radio,
+        fieldValue,
+        fieldText: fieldValue.join(","),
+      });
+      this.$emit("update:visible");
+    },
+
+    handleClickCancel() {
+      this.$emit("cancel");
+      this.$emit("update:visible");
     },
 
     handleChange(val) {
@@ -123,28 +156,30 @@ export default {
       if (!val.trim() || this.isExist(val)) {
         return;
       }
-      this.selectedList.push({
-        id: val,
-      });
+      this.selectedList.push(val);
     },
 
     del($index) {
       this.selectedList.splice($index, 1);
     },
 
-    cancel() {
-      this.$emit("cancel");
+    isExist(val) {
+      return this.selectedList.includes(val);
     },
 
-    isExist(val) {
-      return this.selectedList.findIndex((s) => s.id === val) !== -1;
+    setRadio(radio) {
+      this.radio = radio;
+    },
+
+    setSelectedList(selectedList) {
+      this.selectedList = [].concat(selectedList);
     },
   },
 };
 </script>
 
 <style lang="less" scoped>
-.equal-not-equal {
+.select-input {
   &_header {
     line-height: 30px;
     background-color: #d9d9d9;
@@ -156,6 +191,29 @@ export default {
 
   &_select {
     width: 100%;
+  }
+
+  &_list {
+    margin-top: 10px;
+    ul {
+      padding: 0;
+      margin: 0;
+      li {
+        display: flex;
+        list-style: none;
+        .label {
+          flex: 1;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .close {
+          width: 20px;
+          cursor: pointer;
+        }
+      }
+    }
   }
 
   &_footer {

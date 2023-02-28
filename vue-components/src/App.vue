@@ -46,6 +46,7 @@ export default {
           logicValue: "==",
           componentId: "SelectInputOption",
           searchType: ["number"],
+          multiple: true,
         },
         {
           label: "商主名称",
@@ -62,6 +63,7 @@ export default {
           logicValue: "==",
           componentId: "SelectInputOption",
           searchType: ["number"],
+          multiple: true,
         },
         {
           label: "供应商名称",
@@ -78,6 +80,7 @@ export default {
           logicValue: "==",
           componentId: "SelectInputOption",
           searchType: ["number"],
+          multiple: true,
         },
         {
           label: "广告组名称",
@@ -94,6 +97,7 @@ export default {
           logicValue: "==",
           componentId: "SelectInputOption",
           searchType: ["number"],
+          multiple: true,
         },
         {
           label: "广告名称",
@@ -117,6 +121,20 @@ export default {
           logic: LOGIC_EQ_NEQ,
           logicValue: "==",
           componentId: "RadioOption",
+          source: [
+            {
+              label: "全部",
+              value: 3,
+            },
+            {
+              label: "Android",
+              value: 6,
+            },
+            {
+              label: "iOS",
+              value: 9,
+            },
+          ],
         },
       ],
       saveList: [],
