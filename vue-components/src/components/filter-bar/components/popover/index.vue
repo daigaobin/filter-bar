@@ -63,7 +63,7 @@ export default {
 .el-popover {
   &_container {
     margin: -12px;
-    max-height: 400px;
+    max-height: 300px;
     overflow: auto;
     padding: 10px;
   }

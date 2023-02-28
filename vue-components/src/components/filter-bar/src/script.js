@@ -1,4 +1,3 @@
-import clickOutside from "@/common/clickoutside";
 import MoreButton from "../components/more-button";
 import Popover from "../components/popover";
 import SelectItem from "../components/select-item";
@@ -19,7 +18,17 @@ export default {
     RadioOption,
   },
 
-  directives: { clickOutside },
+  props: {
+    fieldList: {
+      type: Array,
+      default: () => [],
+    },
+
+    saveList: {
+      type: Array,
+      default: () => [],
+    },
+  },
 
   data() {
     /* const LOGIC_EQ = [
@@ -75,7 +84,7 @@ export default {
         top: "0px",
         left: "0px",
       },
-      fieldList: [
+      /* fieldList: [
         {
           label: "商主ID",
           key: "business_id",
@@ -146,7 +155,7 @@ export default {
           logicValue: "==",
           componentId: "RadioOption",
         },
-      ],
+      ], */
       contentList: [],
       moreListVisible: false,
       selectedList: [],
@@ -155,6 +164,10 @@ export default {
   },
 
   computed: {
+    computedFieldList() {
+      return this.fieldList.filter((f) => f.label.indexOf(this.search) !== -1);
+    },
+
     computedSelectedList() {
       return this.selectedList.slice(0, this.maxLength);
     },
@@ -163,12 +176,33 @@ export default {
       return this.selectedList.slice(this.maxLength);
     },
 
+    computedSearchSuggestList() {
+      let searchSuggestList = [];
+      if (this.search) {
+        const type = this.getSearchType();
+        searchSuggestList = this.fieldList.filter(
+          (f) => f.searchType && f.searchType.includes(type)
+        );
+      }
+      return searchSuggestList;
+    },
+
     isShowMoreButton() {
       return this.selectedList.length > this.maxLength;
     },
   },
 
   methods: {
+    getSearchType() {
+      const { length } = this.search;
+      const reg = /\D+/;
+      /* 长度小于10统一处理为string */
+      if (length <= 10 || reg.test(this.search)) {
+        return "string";
+      }
+      return "number";
+    },
+
     handleApply({ logicValue, value: fieldText }) {
       this.currentSelectedItemIndex !== ""
         ? this.update(logicValue, fieldText)
