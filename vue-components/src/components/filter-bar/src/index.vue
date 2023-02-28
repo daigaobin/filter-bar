@@ -17,6 +17,7 @@
               :fieldLabel="d.fieldLabel"
               :logicLabel="d.logicLabel"
               :fieldText="d.fieldText"
+              maxWidth="200px"
               :key="`d.fieldLabel${$index}`"
               class="m-r-10"
               @del="handleDelSelectedItem($index)"
@@ -39,6 +40,7 @@
             v-model="search"
             placeholder="搜索和筛选"
             class="w200 m-r-10"
+            maxLength="100"
             size="mini"
             ref="input"
             @focus.stop="handleInputFocus"
@@ -78,7 +80,7 @@
             <div class="el-popover_container_title">已保存的搜索条件</div>
             <ul class="el-popover_container_list">
               <li
-                @click="handleFieldListClick(f)"
+                @click="handleClickFieldItem(f)"
                 v-for="f in saveList"
                 :key="f.value"
               >
@@ -95,9 +97,11 @@
               <li
                 v-for="s in computedSearchSuggestList"
                 :key="s.value"
-                @click="handleFieldListClick(s)"
+                @click="handleClickSuggestItem(s)"
               >
-                {{ s.label }} {{ s.logic[0].label }} {{ search }}
+                <span class="label">{{ s.label }}</span>
+                <span class="logic">{{ s.logicLabel }}</span>
+                <span class="value">{{ search }}</span>
               </li>
             </ul>
           </template>
@@ -107,7 +111,7 @@
             <div class="el-popover_container_title">筛选条件</div>
             <ul class="el-popover_container_list">
               <li
-                @click="handleFieldListClick(f)"
+                @click="handleClickFieldItem(f)"
                 v-for="f in computedFieldList"
                 :key="f.value"
               >
@@ -191,9 +195,26 @@
         cursor: pointer;
         padding: 5px;
         color: rgba(0, 0, 0, 0.85);
+        display: flex;
         &:hover {
           background-color: rgb(243, 244, 247);
           border-radius: 5px;
+        }
+
+        .label {
+        }
+
+        .logic {
+          color: #bbb;
+          padding: 0 5px;
+        }
+
+        .value {
+          flex: 1;
+          color: #409eff;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
     }

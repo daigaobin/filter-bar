@@ -180,9 +180,15 @@ export default {
       let searchSuggestList = [];
       if (this.search) {
         const type = this.getSearchType();
-        searchSuggestList = this.fieldList.filter(
-          (f) => f.searchType && f.searchType.includes(type)
-        );
+        searchSuggestList = this.fieldList.filter((f) => {
+          if (f.searchType && f.searchType.includes(type)) {
+            const logicLabel = f.logic.find(
+              (l) => l.value === f.logicValue
+            ).label;
+            f.logicLabel = logicLabel;
+            return f;
+          }
+        });
       }
       return searchSuggestList;
     },
@@ -318,15 +324,34 @@ export default {
       this.visibleContent = false;
     },
 
-    handleFieldListClick(logic) {
+    showMorePopover() {
+      this.moreListVisible = true;
+    },
+
+    hideMorePopover() {
+      this.moreListVisible = false;
+    },
+
+    /* 单击field item */
+    handleClickFieldItem(logic) {
       this.fieldValue = "";
       this.setPopoverStyle(this.$refs.input.$el, this.formPopoverStyle);
       this.setValue(logic);
       this.showFormPopover();
     },
 
+    /* 单机搜索建议 item */
+    handleClickSuggestItem(logic) {
+      this.setValue(logic);
+      this.add(logic.logicValue, this.search);
+      this.clearSearch();
+    },
+
     handleDelMoreItem(index) {
       this.selectedList.splice(index + this.maxLength, 1);
+      if (!this.isShowMoreButton) {
+        this.hideMorePopover();
+      }
     },
 
     handleDelSelectedItem(index) {
@@ -341,14 +366,6 @@ export default {
       this.currentKey = key;
     },
 
-    showMorePopover() {
-      this.moreListVisible = true;
-    },
-
-    hideMorePopover() {
-      this.moreListVisible = false;
-    },
-
     handleClose() {
       this.currentSelectedItemIndex = "";
       this.currentKey = "";
@@ -359,5 +376,9 @@ export default {
     },
 
     handleClickSave() {},
+
+    clearSearch() {
+      this.search = "";
+    },
   },
 };

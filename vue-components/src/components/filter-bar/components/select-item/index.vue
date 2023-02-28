@@ -1,6 +1,12 @@
 <template>
   <div class="select-container">
-    <div class="select-content" @click="handleFocus">
+    <div
+      class="select-content"
+      @click="handleFocus"
+      :style="{
+        maxWidth: maxWidth,
+      }"
+    >
       <span class="select-content_name">{{ fieldLabel }}</span>
       <span class="select-content_logic">{{ logicLabel }}</span>
       <span class="select-content_text">
@@ -22,6 +28,9 @@ export default {
     },
     fieldText: {
       type: String | Number,
+    },
+    maxWidth: {
+      type: String,
     },
   },
 
@@ -60,6 +69,7 @@ export default {
     }
 
     &_text {
+      flex: 1;
       margin-right: 5px;
       white-space: nowrap;
       text-overflow: ellipsis;
