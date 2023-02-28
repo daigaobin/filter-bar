@@ -1,7 +1,7 @@
 <!--
  * @Author: 牧鱼
  * @Date: 2023-02-15 18:38:24
- * @LastEditTime: 2023-02-28 15:46:16
+ * @LastEditTime: 2023-02-28 17:48:09
  * @LastEditors: 牧鱼
  * @Description: 筛选器输入选择控件
  * @FilePath: \组件库\vue-components\src\components\filter-bar\components\options\select-input\index.vue
@@ -97,7 +97,7 @@ export default {
       keyword: "",
       keywordList: [],
       radio: this.logicValue,
-      selectedList: [],
+      selectedList: [].concat(this.value),
     };
   },
 

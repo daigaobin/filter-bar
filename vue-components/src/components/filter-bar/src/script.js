@@ -31,40 +31,11 @@ export default {
   },
 
   data() {
-    /* const LOGIC_EQ = [
-      {
-        label: "等于",
-        value: "==",
-      },
-    ]; */
-
-    const LOGIC_EQ_NEQ = [
-      {
-        label: "等于",
-        value: "==",
-      },
-      {
-        label: "不等于",
-        value: "!=",
-      },
-    ];
-
-    const LOGIC_IC_EC = [
-      {
-        label: "包含",
-        value: "include",
-      },
-      {
-        label: "不包含",
-        value: "exclude",
-      },
-    ];
-
     return {
       componentId: "",
       logic: [],
       logicValue: "",
-      popoverTitle: "",
+      logicLabel: "",
       fieldValue: "",
       currentSource: [],
       search: "",
@@ -85,78 +56,6 @@ export default {
         top: "0px",
         left: "0px",
       },
-      /* fieldList: [
-        {
-          label: "商主ID",
-          key: "business_id",
-          logic: LOGIC_EQ_NEQ,
-          logicValue: "==",
-          componentId: "SelectInputOption",
-        },
-        {
-          label: "商主名称",
-          key: "business_name",
-          logic: LOGIC_IC_EC,
-          logicValue: "exclude",
-          componentId: "InputOption",
-        },
-        {
-          label: "供应商ID",
-          key: "supplier_id",
-          logic: LOGIC_EQ_NEQ,
-          logicValue: "==",
-          componentId: "SelectInputOption",
-        },
-        {
-          label: "供应商名称",
-          key: "supplier_name",
-          logic: LOGIC_IC_EC,
-          logicValue: "include",
-          componentId: "InputOption",
-        },
-        {
-          label: "广告组ID",
-          key: "ad_group_id",
-          logic: LOGIC_EQ_NEQ,
-          logicValue: "==",
-          componentId: "SelectInputOption",
-        },
-        {
-          label: "广告组名称",
-          key: "ad_group_name",
-          logic: LOGIC_IC_EC,
-          logicValue: "include",
-          componentId: "InputOption",
-        },
-        {
-          label: "广告ID",
-          key: "ad_id",
-          logic: LOGIC_EQ_NEQ,
-          logicValue: "==",
-          componentId: "SelectInputOption",
-        },
-        {
-          label: "广告名称",
-          key: "ad_name",
-          logic: LOGIC_IC_EC,
-          logicValue: "include",
-          componentId: "InputOption",
-        },
-        {
-          label: "包名",
-          key: "package_name",
-          logic: LOGIC_EQ_NEQ,
-          logicValue: "==",
-          componentId: "RadioOption",
-        },
-        {
-          label: "应用类型",
-          key: "app_type",
-          logic: LOGIC_EQ_NEQ,
-          logicValue: "==",
-          componentId: "RadioOption",
-        },
-      ], */
       contentList: [],
       moreListVisible: false,
       selectedList: [],
@@ -264,7 +163,7 @@ export default {
       this.setFormPopoverInfo(
         this.$refs.moreButton.$el,
         { fieldKey, fieldValue, logicValue },
-        currentSelectedItemIndex
+        currentSelectedItemIndex + this.maxLength
       );
     },
 
@@ -335,8 +234,35 @@ export default {
 
     /* 单击field item */
     handleClickFieldItem(logic) {
-      this.fieldValue = logic.multiple ? [] : "";
-      this.setPopoverStyle(this.$refs.input.$el, this.formPopoverStyle);
+      const { key: fieldKey, multiple, onlyWindow } = logic;
+      let fieldValue = [];
+      let el = this.$refs.input.$el;
+      //判断是否唯一窗口
+      if (onlyWindow) {
+        const selectedItem = this.selectedList.find(
+          (s) => s.fieldKey === fieldKey
+        );
+        selectedItem && (fieldValue = selectedItem.fieldValue);
+
+        const selectedIndex = this.computedSelectedList.findIndex(
+          (s) => s.fieldKey === fieldKey
+        );
+        if (selectedIndex !== -1) {
+          el = this.$refs.selectedItem[selectedIndex].$el;
+          this.currentSelectedItemIndex = selectedIndex;
+        }
+
+        const moreIndex = this.computedMoreList.findIndex(
+          (s) => s.fieldKey === fieldKey
+        );
+        if (moreIndex !== -1) {
+          el = this.$refs.moreButton.$el;
+          this.currentSelectedItemIndex = moreIndex + this.maxLength;
+        }
+      }
+
+      this.setPopoverStyle(el, this.formPopoverStyle);
+      this.fieldValue = fieldValue.length ? fieldValue : multiple ? [] : "";
       this.setValue(logic);
       this.showFormPopover();
     },
@@ -362,7 +288,7 @@ export default {
     setValue({ logic, componentId, label, logicValue, key, source }) {
       this.logic = logic;
       this.componentId = componentId;
-      this.popoverTitle = label;
+      this.logicLabel = label;
       this.logicValue = logicValue;
       this.currentKey = key;
       this.currentSource = source;

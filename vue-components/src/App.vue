@@ -45,8 +45,9 @@ export default {
           logic: LOGIC_EQ_NEQ,
           logicValue: "==",
           componentId: "SelectInputOption",
-          searchType: ["number"],
-          multiple: true,
+          searchType: ["number"], //过滤类型
+          multiple: true, //是否多选
+          onlyWindow: true, //使用唯一窗口
         },
         {
           label: "商主名称",
@@ -64,6 +65,7 @@ export default {
           componentId: "SelectInputOption",
           searchType: ["number"],
           multiple: true,
+          onlyWindow: true,
         },
         {
           label: "供应商名称",
@@ -81,6 +83,7 @@ export default {
           componentId: "SelectInputOption",
           searchType: ["number"],
           multiple: true,
+          onlyWindow: true,
         },
         {
           label: "广告组名称",
@@ -98,6 +101,7 @@ export default {
           componentId: "SelectInputOption",
           searchType: ["number"],
           multiple: true,
+          onlyWindow: true,
         },
         {
           label: "广告名称",
@@ -135,6 +139,7 @@ export default {
               value: 9,
             },
           ],
+          onlyWindow: true,
         },
       ],
       saveList: [],

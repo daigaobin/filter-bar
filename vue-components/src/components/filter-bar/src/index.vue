@@ -22,6 +22,7 @@
               class="m-r-10"
               @del="handleDelSelectedItem($index)"
               @focus.stop="handleFocusSelectedItem($event, d, $index)"
+              ref="selectedItem"
             >
             </SelectItem>
 
@@ -135,7 +136,7 @@
           :is="componentId"
           :logic="logic"
           :logicValue="logicValue"
-          :title="popoverTitle"
+          :title="logicLabel"
           :value="fieldValue"
           :source="currentSource"
           @cancel="visibleContent = false"
