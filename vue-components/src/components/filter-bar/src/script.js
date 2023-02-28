@@ -176,7 +176,7 @@ export default {
       this.fieldValue = fieldValue;
       this.currentSelectedItemIndex = currentSelectedItemIndex;
       this.setPopoverStyle(el, this.formPopoverStyle);
-      this.setValue(Object.assign({}, logic, { logicValue }));
+      this.setComponentInfo(Object.assign({}, logic, { logicValue }));
       this.hideMorePopover();
       this.showFormPopover();
       this.$nextTick(() => {
@@ -263,14 +263,25 @@ export default {
 
       this.setPopoverStyle(el, this.formPopoverStyle);
       this.fieldValue = fieldValue.length ? fieldValue : multiple ? [] : "";
-      this.setValue(logic);
+      this.setComponentInfo(logic);
       this.showFormPopover();
     },
 
-    /* 单机搜索建议 item */
-    handleClickSuggestItem(logic) {
-      this.setValue(logic);
-      this.add(logic.logicValue, this.search);
+    /* 单击搜索建议 item */
+    handleClickSuggestItem(item) {
+      const logicLabel = item.logic.find(
+        (l) => l.value === item.logicValue
+      ).label;
+      this.setComponentInfo(item);
+      //判断是否唯一窗口
+      this.add({
+        fieldKey: item.key,
+        fieldLabel: item.label,
+        logicLabel,
+        logicValue: item.logicValue,
+        fieldValue: this.search,
+        fieldText: this.search,
+      });
       this.clearSearch();
     },
 
@@ -285,7 +296,7 @@ export default {
       this.selectedList.splice(index, 1);
     },
 
-    setValue({ logic, componentId, label, logicValue, key, source }) {
+    setComponentInfo({ logic, componentId, label, logicValue, key, source }) {
       this.logic = logic;
       this.componentId = componentId;
       this.logicLabel = label;
