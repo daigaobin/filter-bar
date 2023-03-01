@@ -5,6 +5,7 @@ import SelectItem from "../components/select-item";
 import InputOption from "../components/options/input";
 import SelectInputOption from "../components/options/select-input";
 import RadioOption from "../components/options/radio";
+import SaveDialog from "../components/save-dialog";
 
 export default {
   name: "FilterBar",
@@ -16,6 +17,7 @@ export default {
     InputOption,
     SelectInputOption,
     RadioOption,
+    SaveDialog,
   },
 
   props: {
@@ -60,6 +62,7 @@ export default {
       moreListVisible: false,
       selectedList: [],
       maxLength: 1,
+      saveDialogVisible: false,
     };
   },
 
@@ -314,7 +317,17 @@ export default {
       this.selectedList = [];
     },
 
-    handleClickSave() {},
+    handleClickSave() {
+      if (!this.selectedList.length) {
+        this.$message.error("请先添加搜索条件以后再保存");
+        return;
+      }
+      this.saveDialogVisible = true;
+    },
+
+    handleSaveSure({ name }) {
+      debugger;
+    },
 
     clearSearch() {
       this.search = "";

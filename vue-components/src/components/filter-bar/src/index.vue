@@ -164,6 +164,13 @@
         </SelectItem>
       </Popover>
     </div>
+
+    <!-- 保存dialog -->
+    <SaveDialog
+      :visible.sync="saveDialogVisible"
+      @sure="handleSaveSure"
+      ref="saveDialog"
+    ></SaveDialog>
   </el-card>
 </template>
 
