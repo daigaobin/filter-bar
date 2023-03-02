@@ -1,9 +1,9 @@
 <template>
   <el-popover
     placement="bottom-start"
-    :width="width"
     trigger="manual"
     v-model="visible"
+    :width="width"
     :visible-arrow="false"
     popper-class="filter-bar_popper"
     :popper-options="{ boundariesElement: 'body', removeOnDestroy: true }"
@@ -24,7 +24,7 @@ export default {
 
   props: {
     width: {
-      type: Number | String,
+      type: String | Number,
       default: () => 200,
     },
 
@@ -64,7 +64,7 @@ export default {
   &_container {
     margin: -12px;
     max-height: 300px;
-    overflow: auto;
+    overflow: hidden;
     padding: 10px;
   }
 }

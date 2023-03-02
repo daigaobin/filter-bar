@@ -1,7 +1,7 @@
 <!--
  * @Author: 牧鱼
  * @Date: 2023-02-15 18:38:24
- * @LastEditTime: 2023-02-28 16:39:17
+ * @LastEditTime: 2023-03-02 16:56:21
  * @LastEditors: 牧鱼
  * @Description: 筛选器input输入框控件
  * @FilePath: \组件库\vue-components\src\components\filter-bar\components\options\input\index.vue
@@ -19,6 +19,7 @@
     <el-input
       v-model="keyword"
       :placeholder="getPlaceholder"
+      :maxLength="100"
       size="mini"
       class="m-t-10"
     ></el-input>

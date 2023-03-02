@@ -1,6 +1,11 @@
 <template>
   <div id="app">
-    <FilterBar :fieldList="fieldList" :saveList="saveList"></FilterBar>
+    <FilterBar
+      :fieldList="fieldList"
+      :saveList="saveList"
+      @delete="handleDelete"
+      @apply="handleApply"
+    ></FilterBar>
   </div>
 </template>
 
@@ -142,8 +147,49 @@ export default {
           onlyWindow: true,
         },
       ],
-      saveList: [],
+      saveList: [
+        {
+          name: "sxxxxx",
+          id: 1232132,
+          data: [
+            {
+              fieldKey: "business_id",
+              fieldLabel: "商主ID",
+              logicLabel: "等于",
+              logicValue: "==",
+              fieldValue: ["商主ID", "商主ID2"],
+              fieldText: "商主ID,商主ID2",
+            },
+            {
+              fieldKey: "business_name",
+              fieldLabel: "商主名称",
+              logicLabel: "包含",
+              logicValue: "include",
+              fieldValue: "商主名称",
+              fieldText: "商主名称",
+            },
+            {
+              fieldKey: "app_type",
+              fieldLabel: "应用类型",
+              logicLabel: "等于",
+              logicValue: "==",
+              fieldValue: 3,
+              fieldText: "全部",
+            },
+          ],
+        },
+      ],
     };
+  },
+
+  methods: {
+    handleDelete(id) {
+      debugger;
+    },
+
+    handleApply(data) {
+      debugger;
+    },
   },
 };
 </script>

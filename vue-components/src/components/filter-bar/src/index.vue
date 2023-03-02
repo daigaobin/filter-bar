@@ -9,7 +9,6 @@
               <i class="el-icon-search"></i>
             </slot>
           </div>
-
           <!-- 选中展示 -->
           <div class="filter-bar_left_content_selected">
             <SelectItem
@@ -77,22 +76,25 @@
       >
         <div class="el-popover_container">
           <!-- 已保存 -->
-          <template v-if="saveList.length">
+          <template v-if="saveList.length && search === ''">
             <div class="el-popover_container_title">已保存的搜索条件</div>
             <ul class="el-popover_container_list">
               <li
-                @click="handleClickFieldItem(f)"
-                v-for="f in saveList"
-                :key="f.value"
+                @click="handleClickSaveList(s)"
+                v-for="(s, $index) in saveList"
+                :key="`saveList-${$index}`"
               >
-                <span>{{ f.label }}</span>
-                <i class="el-icon-close"></i>
+                <span class="name">{{ s.name }}</span>
+                <i
+                  class="el-icon-close close-btn"
+                  @click.stop="handleDelSaveListById(s.id)"
+                ></i>
               </li>
             </ul>
           </template>
 
           <!-- 搜索建议 -->
-          <template v-if="computedSearchSuggestList.length">
+          <template v-if="search !== ''">
             <div class="el-popover_container_title">搜索建议</div>
             <ul class="el-popover_container_list">
               <li
@@ -100,7 +102,7 @@
                 :key="s.value"
                 @click="handleClickSuggestItem(s)"
               >
-                <span class="label">{{ s.label }}</span>
+                <span>{{ s.label }}</span>
                 <span class="logic">{{ s.logicLabel }}</span>
                 <span class="value">{{ search }}</span>
               </li>
@@ -148,11 +150,12 @@
       <!-- 更多内容下拉列表 -->
       <Popover
         :visible.sync="visibleMorePopover"
-        width="auto"
         :positionStyle="moreListPopoverStyle"
+        width="auto"
       >
         <SelectItem
           v-for="(d, $index) in computedMoreList"
+          maxWidth="300px"
           :fieldLabel="d.fieldLabel"
           :logicLabel="d.logicLabel"
           :fieldText="d.fieldText"
@@ -205,12 +208,18 @@
         padding: 5px;
         color: rgba(0, 0, 0, 0.85);
         display: flex;
+        align-items: center;
         &:hover {
           background-color: rgb(243, 244, 247);
           border-radius: 5px;
         }
 
-        .label {
+        .name {
+          flex: 1;
+        }
+
+        .close-btn {
+          padding: 0 5px;
         }
 
         .logic {

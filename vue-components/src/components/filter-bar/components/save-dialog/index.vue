@@ -18,7 +18,7 @@
         <el-input
           v-model="ruleForm.name"
           size="small"
-          maxlength="100"
+          maxlength="40"
         ></el-input>
       </el-form-item>
     </el-form>

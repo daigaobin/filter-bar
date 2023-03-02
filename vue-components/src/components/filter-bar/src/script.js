@@ -136,6 +136,7 @@ export default {
      */
     handleApply(value) {
       this.addOrUpdate(value);
+      this.applyEmit();
     },
 
     /**
@@ -340,6 +341,16 @@ export default {
         fieldValue,
         fieldText,
       });
+      this.applyEmit();
+    },
+
+    handleClickSaveList({ data }) {
+      this.selectedList = data;
+      this.applyEmit();
+    },
+
+    handleDelSaveListById(id) {
+      this.$emit("delete", id);
     },
 
     getSelectedOnlyItemInfo(fieldKey) {
@@ -397,7 +408,14 @@ export default {
     },
 
     handleSaveSure({ name }) {
-      debugger;
+      this.$emit("save", {
+        name,
+        data: this.selectedList,
+      });
+    },
+
+    applyEmit() {
+      this.$emit("apply", this.selectedList);
     },
 
     /**
@@ -412,6 +430,7 @@ export default {
      */
     handleClickClear() {
       this.selectedList = [];
+      this.applyEmit();
     },
 
     showFieldPopover() {
