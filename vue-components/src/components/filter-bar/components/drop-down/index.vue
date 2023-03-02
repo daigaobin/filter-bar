@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  name: "MoreButton",
+  name: "DropDownButton",
   props: {
     text: {
       type: String,

@@ -1,4 +1,4 @@
-import MoreButton from "../components/more-button";
+import DropDown from "../components/drop-down";
 import Popover from "../components/popover";
 import SelectItem from "../components/select-item";
 
@@ -11,7 +11,7 @@ export default {
   name: "FilterBar",
 
   components: {
-    MoreButton,
+    DropDown,
     Popover,
     SelectItem,
     InputOption,
@@ -41,8 +41,7 @@ export default {
       fieldValue: "",
       currentSource: [],
       search: "",
-      visibleList: false,
-      visibleContent: false,
+      visibleFormPopover: false,
       fieldListPopoverStyle: {
         position: "absolute",
         top: "0px",
@@ -58,11 +57,10 @@ export default {
         top: "0px",
         left: "0px",
       },
-      contentList: [],
-      moreListVisible: false,
+      visibleMorePopover: false,
       selectedList: [],
       maxLength: 1,
-      saveDialogVisible: false,
+      visibleSaveDialog: false,
     };
   },
 
@@ -99,9 +97,29 @@ export default {
     isShowMoreButton() {
       return this.selectedList.length > this.maxLength;
     },
+
+    dropDownText() {
+      const { length } = this.computedMoreList;
+      return `${length}个筛选条件`;
+    },
   },
 
   methods: {
+    /**
+     * 选中input输入框
+     */
+    handleInputFocus() {
+      this.setPopoverStyle(this.$refs.input.$el, this.fieldListPopoverStyle);
+      this.showFieldPopover();
+    },
+
+    /**
+     * 移出input输入框
+     */
+    handleInputBlur() {
+      this.hideFieldPopover();
+    },
+
     getSearchType() {
       const { length } = this.search;
       const reg = /\D+/;
@@ -112,12 +130,28 @@ export default {
       return "number";
     },
 
+    /**
+     * 应用按钮回调函数
+     * @param {*} value
+     */
     handleApply(value) {
+      this.addOrUpdate(value);
+    },
+
+    /**
+     * 新增Or更新
+     * @param {*} value
+     */
+    addOrUpdate(value) {
       this.currentSelectedItemIndex !== ""
         ? this.update(value)
         : this.add(value);
     },
 
+    /**
+     * 新增同时判断是否存在相同的值
+     * @param {*} value
+     */
     add(value) {
       if (!this.isExist(value)) {
         this.selectedList.push({
@@ -127,6 +161,24 @@ export default {
       }
     },
 
+    /**
+     * 更新Field
+     * @param {*} value
+     */
+    update(value) {
+      const fieldKey =
+        this.selectedList[this.currentSelectedItemIndex].fieldKey;
+      this.selectedList.splice(this.currentSelectedItemIndex, 1, {
+        fieldKey,
+        ...value,
+      });
+    },
+
+    /**
+     * 判断是否存在相同的值
+     * @param {*} param0
+     * @returns
+     */
     isExist({ logicValue, fieldValue }) {
       const existList = this.selectedList.filter(
         (s) =>
@@ -138,106 +190,84 @@ export default {
       return !!existList.length;
     },
 
-    update(value) {
-      const fieldKey =
-        this.selectedList[this.currentSelectedItemIndex].fieldKey;
-      this.selectedList.splice(this.currentSelectedItemIndex, 1, {
-        fieldKey,
-        ...value,
-      });
-    },
-
-    handleFocusSelectedItem(
-      $event,
-      { fieldKey, fieldValue, logicValue },
-      currentSelectedItemIndex
-    ) {
+    /**
+     * 选中已选的Field
+     * @param {*} $event
+     * @param {*} field
+     * @param {*} currentSelectedItemIndex
+     */
+    handleFocusSelectedItem($event, field, currentSelectedItemIndex) {
       this.setFormPopoverInfo(
         $event.currentTarget,
-        { fieldKey, fieldValue, logicValue },
+        field,
         currentSelectedItemIndex
       );
     },
 
-    handleFocusMoreItem(
-      { fieldKey, fieldValue, logicValue },
-      currentSelectedItemIndex
-    ) {
+    /**
+     * 选中更多下拉列表中的Field
+     * @param {*} field
+     * @param {*} currentSelectedItemIndex
+     */
+    handleFocusMoreItem(field, currentSelectedItemIndex) {
       this.setFormPopoverInfo(
         this.$refs.moreButton.$el,
-        { fieldKey, fieldValue, logicValue },
+        field,
         currentSelectedItemIndex + this.maxLength
       );
     },
 
+    /**
+     * 设置表单内容、位置等
+     * @param {*} el
+     * @param {*} param1
+     * @param {*} currentSelectedItemIndex
+     */
     setFormPopoverInfo(
       el,
       { fieldKey, fieldValue, logicValue },
       currentSelectedItemIndex
     ) {
       const logic = this.fieldList.find((f) => f.key === fieldKey);
-      this.fieldValue = fieldValue;
+      this.setFieldValue(fieldValue);
       this.currentSelectedItemIndex = currentSelectedItemIndex;
       this.setPopoverStyle(el, this.formPopoverStyle);
       this.setComponentInfo(Object.assign({}, logic, { logicValue }));
       this.hideMorePopover();
       this.showFormPopover();
-      this.$nextTick(() => {
-        this.$refs.formPopover.$refs.popover.updatePopper();
-      });
     },
 
+    /**
+     * 单击更多下拉列表按钮事件
+     */
     handleClickMore() {
       this.setPopoverStyle(
         this.$refs.moreButton.$el,
         this.moreListPopoverStyle
       );
-      this.showMorePopover();
       this.hideFormPopover();
+      this.showMorePopover();
     },
 
-    handleInputFocus() {
-      this.setPopoverStyle(this.$refs.input.$el, this.fieldListPopoverStyle);
-      this.showFieldPopover();
-    },
-
-    handleInputBlur() {
-      this.hideFieldPopover();
-    },
-
+    /**
+     * 设置内容popover位置
+     * @param {*} $el
+     * @param {*} popoverStyle
+     */
     setPopoverStyle($el, popoverStyle) {
       const { width, height, left, top } = $el.getBoundingClientRect();
       popoverStyle.left = left + "px";
       popoverStyle.top = height - 20 + "px";
     },
 
-    showFieldPopover() {
-      this.$refs.fieldPopover.doShow();
-    },
-
-    hideFieldPopover() {
-      this.$refs.fieldPopover.doClose();
-    },
-
-    showFormPopover() {
-      this.visibleContent = true;
-    },
-
-    hideFormPopover() {
-      this.visibleContent = false;
-    },
-
-    showMorePopover() {
-      this.moreListVisible = true;
-    },
-
-    hideMorePopover() {
-      this.moreListVisible = false;
-    },
-
-    /* 单击field item */
-    handleClickFieldItem(logic) {
-      const { key: fieldKey, multiple, onlyWindow } = logic;
+    /**
+     * 单击Field，判断是否唯一窗口
+     * onlyWindow：true打开原窗口
+     * onlyWindow：false打开新窗口
+     * @param {*} field
+     */
+    handleClickFieldItem(field) {
+      const { key: fieldKey, multiple, onlyWindow } = field;
       let fieldValue = [];
       let el = this.$refs.input.$el;
       //判断是否唯一窗口
@@ -266,26 +296,48 @@ export default {
 
       this.setPopoverStyle(el, this.formPopoverStyle);
       this.fieldValue = fieldValue.length ? fieldValue : multiple ? [] : "";
-      this.setComponentInfo(logic);
+      this.setComponentInfo(field);
       this.showFormPopover();
     },
 
-    /* 单击搜索建议 item */
+    /* 单击搜索建议item */
     handleClickSuggestItem(item) {
-      const logicLabel = item.logic.find(
-        (l) => l.value === item.logicValue
-      ).label;
-      this.setComponentInfo(item);
-      //判断是否唯一窗口
-      this.add({
-        fieldKey: item.key,
-        fieldLabel: item.label,
+      const {
+        key: fieldKey,
+        multiple,
+        onlyWindow,
+        logicValue,
         logicLabel,
-        logicValue: item.logicValue,
-        fieldValue: this.search,
-        fieldText: this.search,
+        label: fieldLabel,
+      } = item;
+      let fieldValue = multiple ? [this.search] : this.search;
+      let fieldText = this.search;
+      //判断存不存在
+      const { field, index } = this.getSelectedItemInfo(fieldKey);
+      if (field) {
+        if (onlyWindow) {
+          this.currentSelectedItemIndex = index;
+          fieldValue = multiple
+            ? field.fieldValue.concat([this.search])
+            : this.search;
+          fieldText = multiple ? fieldValue.join(",") : this.search;
+        }
+      }
+      this.addOrUpdate({
+        fieldKey,
+        fieldLabel,
+        logicLabel,
+        logicValue,
+        fieldValue,
+        fieldText,
       });
       this.clearSearch();
+    },
+
+    getSelectedItemInfo(fieldKey) {
+      const field = this.selectedList.find((s) => s.fieldKey === fieldKey);
+      const index = this.selectedList.findIndex((s) => s.fieldKey === fieldKey);
+      return { field, index };
     },
 
     handleDelMoreItem(index) {
@@ -308,29 +360,66 @@ export default {
       this.currentSource = source;
     },
 
+    setFieldValue(fieldValue) {
+      this.fieldValue = fieldValue;
+    },
+
     handleClose() {
       this.currentSelectedItemIndex = "";
       this.currentKey = "";
     },
 
-    handleClickClear() {
-      this.selectedList = [];
-    },
-
     handleClickSave() {
       if (!this.selectedList.length) {
-        this.$message.error("请先添加搜索条件以后再保存");
+        this.$message.error("请先添加搜索条件后，再保存");
         return;
       }
-      this.saveDialogVisible = true;
+      this.visibleSaveDialog = true;
     },
 
     handleSaveSure({ name }) {
       debugger;
     },
 
+    /**
+     * 清空输入框
+     */
     clearSearch() {
       this.search = "";
+    },
+
+    /**
+     * 单击清除按钮事件
+     */
+    handleClickClear() {
+      this.selectedList = [];
+    },
+
+    showFieldPopover() {
+      this.$refs.fieldPopover.doShow();
+    },
+
+    hideFieldPopover() {
+      this.$refs.fieldPopover.doClose();
+    },
+
+    showFormPopover() {
+      this.visibleFormPopover = true;
+      this.$nextTick(() => {
+        this.$refs.formPopover.$refs.popover.updatePopper();
+      });
+    },
+
+    hideFormPopover() {
+      this.visibleFormPopover = false;
+    },
+
+    showMorePopover() {
+      this.visibleMorePopover = true;
+    },
+
+    hideMorePopover() {
+      this.visibleMorePopover = false;
     },
   },
 };

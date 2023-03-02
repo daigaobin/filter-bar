@@ -26,14 +26,14 @@
             >
             </SelectItem>
 
-            <MoreButton
-              text="2个筛选条件"
+            <DropDown
+              :text="dropDownText"
               ref="moreButton"
               @click.stop="handleClickMore"
               class="m-r-10"
               v-if="isShowMoreButton"
             >
-            </MoreButton>
+            </DropDown>
           </div>
 
           <!-- 输入 -->
@@ -51,17 +51,17 @@
         <!-- 清除 -->
         <div class="filter-bar_left_clear">
           <el-button type="text" size="mini" @click="handleClickSave"
-            >保存</el-button
+            >保 存</el-button
           >
           <el-button type="text" size="mini" @click="handleClickClear"
-            >清除</el-button
+            >清 除</el-button
           >
         </div>
       </div>
 
       <div class="filter-bar_right">
         <slot name="right">
-          <el-button size="mini">更新</el-button>
+          <el-button size="mini">更 新</el-button>
         </slot>
       </div>
 
@@ -126,20 +126,20 @@
 
       <!-- 填写具体filter内容popover -->
       <Popover
-        :visible.sync="visibleContent"
+        :visible.sync="visibleFormPopover"
         :positionStyle="formPopoverStyle"
         @close="handleClose"
         ref="formPopover"
       >
         <component
-          :visible.sync="visibleContent"
+          :visible.sync="visibleFormPopover"
           :is="componentId"
           :logic="logic"
           :logicValue="logicValue"
           :title="logicLabel"
           :value="fieldValue"
           :source="currentSource"
-          @cancel="visibleContent = false"
+          @cancel="visibleFormPopover = false"
           @apply="handleApply"
           ref="filterContent"
         ></component>
@@ -147,7 +147,7 @@
 
       <!-- 更多内容下拉列表 -->
       <Popover
-        :visible.sync="moreListVisible"
+        :visible.sync="visibleMorePopover"
         width="auto"
         :positionStyle="moreListPopoverStyle"
       >
@@ -167,7 +167,7 @@
 
     <!-- 保存dialog -->
     <SaveDialog
-      :visible.sync="saveDialogVisible"
+      :visible.sync="visibleSaveDialog"
       @sure="handleSaveSure"
       ref="saveDialog"
     ></SaveDialog>
