@@ -229,10 +229,14 @@ export default {
       currentSelectedItemIndex
     ) {
       const logic = this.fieldList.find((f) => f.key === fieldKey);
-      this.setFieldValue(fieldValue);
-      this.currentSelectedItemIndex = currentSelectedItemIndex;
       this.setPopoverStyle(el, this.formPopoverStyle);
-      this.setComponentInfo(Object.assign({}, logic, { logicValue }));
+      this.setComponentInfo(
+        Object.assign({}, logic, {
+          logicValue,
+          fieldValue,
+          currentSelectedItemIndex,
+        })
+      );
       this.hideMorePopover();
       this.showFormPopover();
     },
@@ -269,20 +273,19 @@ export default {
     handleClickFieldItem(field) {
       const { key: fieldKey, multiple, onlyWindow } = field;
       let fieldValue = [];
+      let currentSelectedItemIndex = "";
       let el = this.$refs.input.$el;
       //判断是否唯一窗口
       if (onlyWindow) {
-        const selectedItem = this.selectedList.find(
-          (s) => s.fieldKey === fieldKey
-        );
-        selectedItem && (fieldValue = selectedItem.fieldValue);
+        const { item, index } = this.getSelectedOnlyItemInfo(fieldKey);
+        item && (fieldValue = item.fieldValue);
 
         const selectedIndex = this.computedSelectedList.findIndex(
           (s) => s.fieldKey === fieldKey
         );
         if (selectedIndex !== -1) {
           el = this.$refs.selectedItem[selectedIndex].$el;
-          this.currentSelectedItemIndex = selectedIndex;
+          currentSelectedItemIndex = selectedIndex;
         }
 
         const moreIndex = this.computedMoreList.findIndex(
@@ -290,13 +293,14 @@ export default {
         );
         if (moreIndex !== -1) {
           el = this.$refs.moreButton.$el;
-          this.currentSelectedItemIndex = moreIndex + this.maxLength;
+          currentSelectedItemIndex = index;
         }
       }
-
+      fieldValue = fieldValue.length ? fieldValue : multiple ? [] : "";
       this.setPopoverStyle(el, this.formPopoverStyle);
-      this.fieldValue = fieldValue.length ? fieldValue : multiple ? [] : "";
-      this.setComponentInfo(field);
+      this.setComponentInfo(
+        Object.assign({}, field, { fieldValue, currentSelectedItemIndex })
+      );
       this.showFormPopover();
     },
 
@@ -310,17 +314,22 @@ export default {
         logicLabel,
         label: fieldLabel,
       } = item;
-      let fieldValue = multiple ? [this.search] : this.search;
       let fieldText = this.search;
-      //判断存不存在
-      const { field, index } = this.getSelectedItemInfo(fieldKey);
-      if (field) {
-        if (onlyWindow) {
+      let fieldValue = multiple ? [fieldText] : fieldText;
+      this.clearSearch();
+
+      if (onlyWindow) {
+        const { field, index } = this.getSelectedOnlyItemInfo(fieldKey);
+        //判断添加的内容是否存在
+        if (field) {
+          if (field.fieldValue.includes(fieldText)) {
+            return;
+          }
           this.currentSelectedItemIndex = index;
           fieldValue = multiple
-            ? field.fieldValue.concat([this.search])
-            : this.search;
-          fieldText = multiple ? fieldValue.join(",") : this.search;
+            ? field.fieldValue.concat([fieldText])
+            : fieldText;
+          fieldText = multiple ? fieldValue.join(",") : fieldText;
         }
       }
       this.addOrUpdate({
@@ -331,10 +340,9 @@ export default {
         fieldValue,
         fieldText,
       });
-      this.clearSearch();
     },
 
-    getSelectedItemInfo(fieldKey) {
+    getSelectedOnlyItemInfo(fieldKey) {
       const field = this.selectedList.find((s) => s.fieldKey === fieldKey);
       const index = this.selectedList.findIndex((s) => s.fieldKey === fieldKey);
       return { field, index };
@@ -351,13 +359,24 @@ export default {
       this.selectedList.splice(index, 1);
     },
 
-    setComponentInfo({ logic, componentId, label, logicValue, key, source }) {
+    setComponentInfo({
+      logic,
+      componentId,
+      label,
+      logicValue,
+      key,
+      source,
+      fieldValue,
+      currentSelectedItemIndex,
+    }) {
       this.logic = logic;
       this.componentId = componentId;
       this.logicLabel = label;
       this.logicValue = logicValue;
       this.currentKey = key;
       this.currentSource = source;
+      this.fieldValue = fieldValue;
+      this.currentSelectedItemIndex = currentSelectedItemIndex;
     },
 
     setFieldValue(fieldValue) {
