@@ -5,19 +5,34 @@
       :saveList="saveList"
       @delete="handleDelete"
       @apply="handleApply"
+      class="m-b-10"
     ></FilterBar>
+
+    <el-row>
+      <el-col :span="20">
+        <el-button class="f-r m-b-10" size="small">自定义列</el-button>
+        <el-table :height="200" border>
+          <!-- <el-column label="名称"></el-column> -->
+        </el-table>
+      </el-col>
+      <el-col :span="4">
+        <!-- <CustomColumn></CustomColumn> -->
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
 // import HelloWorld from "./components/HelloWorld.vue";
 import FilterBar from "./components/filter-bar";
+import CustomColumn from "./components/custom-column";
 
 export default {
   name: "App",
   components: {
     // HelloWorld,
     FilterBar,
+    CustomColumn,
   },
   data() {
     const LOGIC_EQ_NEQ = [
@@ -184,11 +199,9 @@ export default {
 
   methods: {
     handleDelete(id) {
-      debugger;
     },
 
     handleApply(data) {
-      debugger;
     },
   },
 };
@@ -204,5 +217,13 @@ body {
   color: #2c3e50;
   background-color: #ccc;
   margin: 10px;
+}
+
+.f-r {
+  float: right;
+}
+
+.m-b-10 {
+  margin-bottom: 10px;
 }
 </style>

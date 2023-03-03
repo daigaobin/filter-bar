@@ -117,7 +117,7 @@ export default {
      * 移出input输入框
      */
     handleInputBlur() {
-      this.hideFieldPopover();
+      // this.hideFieldPopover();
     },
 
     getSearchType() {
@@ -262,7 +262,7 @@ export default {
     setPopoverStyle($el, popoverStyle) {
       const { width, height, left, top } = $el.getBoundingClientRect();
       popoverStyle.left = left + "px";
-      popoverStyle.top = height - 20 + "px";
+      popoverStyle.top = top + "px";
     },
 
     /**

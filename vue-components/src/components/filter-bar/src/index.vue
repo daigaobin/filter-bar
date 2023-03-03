@@ -188,10 +188,26 @@
 
 .el-popover {
   &_container {
-    margin: -12px;
+    // margin: -12px;
     max-height: 320px;
     overflow: auto;
-    padding: 10px;
+    // padding: 10px;
+
+    /* 1,滚动条 */
+    ::-webkit-scrollbar {
+      width: 20px; /* 纵向滚动条 宽度 */
+      height: 15px; /* 横向滚动条 高度 */
+      background: pink; /* 整体背景 */
+      border-radius: 10px; /* 整体 圆角 */
+    }
+
+    /* 2,滚动条两端的按钮 */
+    ::-webkit-scrollbar-button {
+      width: 30px; /* 横向滚动条 宽度 */
+      height: 20px; /* 纵向滚动条 高度 */
+      background: black;
+      border-radius: 10px;
+    }
 
     &_title {
       font-weight: bold;
@@ -245,7 +261,7 @@
   border-radius: 5px;
   padding: 5px 10px;
   display: flex;
-  position: relative;
+  // position: relative;
 
   &_left {
     flex: 1;
@@ -300,5 +316,6 @@
 <style lang="less">
 .filter-bar_popper {
   border-radius: 10px;
+  padding: 10px 0 10px 10px;
 }
 </style>

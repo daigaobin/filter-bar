@@ -53,12 +53,6 @@ export default {
 };
 </script>
 
-<style lang="less">
-.el-popover.filter-bar_popper {
-  border-radius: 10px;
-}
-</style>
-
 <style lang="less" scoped>
 .el-popover {
   &_container {
